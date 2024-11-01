@@ -12,8 +12,9 @@ import (
 
 // Namespaces
 const (
-	NamespaceXAdES = "http://uri.etsi.org/01903/v1.3.2#"
-	NamespaceDSig  = "http://www.w3.org/2000/09/xmldsig#"
+	NamespaceXAdES    = "http://uri.etsi.org/01903/v1.3.2#"
+	NamespaceXAdES141 = "http://uri.etsi.org/01903/v1.4.1#"
+	NamespaceDSig     = "http://www.w3.org/2000/09/xmldsig#"
 )
 
 // Namespace names (short)
@@ -114,9 +115,10 @@ type Object struct {
 // QualifyingProperties the funny XaDES signature confirmation policy data. This is the only place the
 // `xades` namespace is required, so we can add it just here.
 type QualifyingProperties struct {
-	XAdESNamespace string `xml:"xmlns:xades,attr,omitempty"`
-	ID             string `xml:"Id,attr"`
-	Target         string `xml:"Target,attr"`
+	XAdESNamespace    string `xml:"xmlns:xades,attr,omitempty"`
+	XAdES141Namespace string `xml:"xmlns:xades141,attr,omitempty"`
+	ID                string `xml:"Id,attr"`
+	Target            string `xml:"Target,attr"`
 
 	SignedProperties   *SignedProperties   `xml:"xades:SignedProperties"`
 	UnsignedProperties *UnsignedProperties `xml:"xades:UnsignedProperties,omitempty"`
@@ -128,7 +130,7 @@ type SignedProperties struct {
 	ID      string   `xml:"Id,attr"`
 
 	SignatureProperties  *SignedSignatureProperties `xml:"xades:SignedSignatureProperties"`
-	DataObjectProperties *DataObjectFormat          `xml:"xades:SignedDataObjectProperties>xades:DataObjectFormat"`
+	DataObjectProperties *DataObjectFormat          `xml:"xades:SignedDataObjectProperties>xades:DataObjectFormat,omitempty"`
 }
 
 // SignedSignatureProperties contains ...
@@ -170,8 +172,8 @@ type PolicyIdentifier struct {
 
 // SigPolicyID contains ...
 type SigPolicyID struct {
-	Identifier  string `xml:"xades:Identifier"`
-	Description string `xml:"xades:Description"`
+	Identifier  string  `xml:"xades:Identifier"`
+	Description *string `xml:"xades:Description,omitempty"`
 }
 
 // SignerRole contains ...
@@ -207,12 +209,12 @@ type Identifier struct {
 }
 
 const (
-	signatureIDFormat               = "Signature-%s"
-	signatureRootIDFormat           = "Signature-%s-Signature"
-	sigPropertiesIDFormat           = "Signature-%s-SignedProperties"
-	sigQualifyingPropertiesIDFormat = "Signature-%s-QualifyingProperties"
+	signatureIDFormat               = "xmldsig-%s"
+	signatureRootIDFormat           = "xmldsig-%s"
+	sigPropertiesIDFormat           = "xmldsig-%s-signedprops"
+	sigQualifyingPropertiesIDFormat = "xmldsig-%s-QualifyingProperties"
 	referenceIDFormat               = "Reference-%s"
-	certificateIDFormat             = "Certificate-%s"
+	certificateIDFormat             = "xmldsig-%s-KeyInfo"
 )
 
 func newSignature(data []byte, opts ...Option) (*Signature, error) {
@@ -287,13 +289,14 @@ func addRootNamespaces(ns Namespaces, data []byte) error {
 func (s *Signature) buildQualifyingProperties() {
 	cert := s.opts.cert
 	qp := &QualifyingProperties{
-		XAdESNamespace: NamespaceXAdES,
-		ID:             fmt.Sprintf(sigQualifyingPropertiesIDFormat, s.opts.docID),
-		Target:         fmt.Sprintf("#"+signatureRootIDFormat, s.opts.docID),
+		XAdESNamespace:    NamespaceXAdES,
+		XAdES141Namespace: NamespaceXAdES141,
+		ID:                fmt.Sprintf(sigQualifyingPropertiesIDFormat, s.opts.docID),
+		Target:            fmt.Sprintf("#"+signatureRootIDFormat, s.opts.docID),
 		SignedProperties: &SignedProperties{
 			ID: fmt.Sprintf(sigPropertiesIDFormat, s.opts.docID),
 			SignatureProperties: &SignedSignatureProperties{
-				SigningTime: s.opts.timeNow().Format(ISO8601),
+				SigningTime: s.opts.timeNow().In(time.FixedZone("America/Bogota", -5*60*60)).Format(ISO8601), // Verify if Colombia or UTC tz
 				SigningCertificate: &SigningCertificate{
 					CertDigest: &Digest{
 						Method: &AlgorithmMethod{
@@ -308,18 +311,18 @@ func (s *Signature) buildQualifyingProperties() {
 				},
 				PolicyIdentifier: s.xadesPolicyIdentifier(),
 			},
-			DataObjectProperties: &DataObjectFormat{
-				ObjectReference: "#" + s.referenceID,
-				Description:     s.opts.xades.Description,
-				ObjectIdentifier: &ObjectIdentifier{
-					Identifier: &Identifier{
-						Qualifier: "OIDAsURN",
-						Value:     "urn:oid:1.2.840.10003.5.109.10",
-					},
-					// Description: "",
-				},
-				MimeType: "text/xml",
-			},
+			DataObjectProperties: nil, //&DataObjectFormat{
+			//	ObjectReference: "#" + s.referenceID,
+			//	Description:     s.opts.xades.Description,
+			//	ObjectIdentifier: &ObjectIdentifier{
+			//		Identifier: &Identifier{
+			//			Qualifier: "OIDAsURN",
+			//			Value:     "urn:oid:1.2.840.10003.5.109.10",
+			//		},
+			//		// Description: "",
+			//	},
+			//	MimeType: "text/xml",
+			//},
 		},
 	}
 
@@ -343,7 +346,7 @@ func (s *Signature) xadesPolicyIdentifier() *PolicyIdentifier {
 	return &PolicyIdentifier{
 		SigPolicyID: &SigPolicyID{
 			Identifier:  policy.URL,
-			Description: policy.Description,
+			Description: nil, //policy.Description,
 		},
 		SigPolicyHash: &Digest{
 			Method: &AlgorithmMethod{
@@ -363,10 +366,10 @@ func (s *Signature) buildKeyInfo() {
 				certificate.NakedPEM(),
 			},
 		},
-		KeyValue: &KeyValue{
-			Modulus:  certificate.PrivateKeyInfo().Modulus,
-			Exponent: certificate.PrivateKeyInfo().Exponent,
-		},
+		KeyValue: nil, //&KeyValue{
+		//	Modulus:  certificate.PrivateKeyInfo().Modulus,
+		//	Exponent: certificate.PrivateKeyInfo().Exponent,
+		//},
 	}
 
 	for _, ca := range certificate.CaChain {
@@ -405,7 +408,7 @@ func (s *Signature) buildSignedInfo() error {
 			},
 		},
 		DigestMethod: &AlgorithmMethod{
-			Algorithm: "http://www.w3.org/2001/04/xmlenc#sha512",
+			Algorithm: AlgEncSHA256,
 		},
 		DigestValue: docDigest,
 	})
@@ -465,7 +468,7 @@ func (s *Signature) buildSignatureValue() error {
 	}
 
 	s.Value = &Value{
-		ID:    fmt.Sprintf(signatureIDFormat+"-SignatureValue", s.opts.docID),
+		ID:    fmt.Sprintf(signatureIDFormat+"-sigvalue", s.opts.docID),
 		Value: signatureValue,
 	}
 	return nil
