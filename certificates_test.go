@@ -3,7 +3,7 @@ package xmldsig_test
 import (
 	"testing"
 
-	"github.com/invopop/xmldsig"
+	"github.com/StephanoAH/xmldsig"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

@@ -297,7 +297,7 @@ func (s *Signature) buildQualifyingProperties() {
 				SigningCertificate: &SigningCertificate{
 					CertDigest: &Digest{
 						Method: &AlgorithmMethod{
-							Algorithm: AlgEncSHA512,
+							Algorithm: AlgEncSHA256,
 						},
 						Value: cert.Fingerprint(),
 					},
@@ -419,7 +419,7 @@ func (s *Signature) buildSignedInfo() error {
 	si.Reference = append(si.Reference, &Reference{
 		URI: "#" + s.KeyInfo.ID,
 		DigestMethod: &AlgorithmMethod{
-			Algorithm: AlgEncSHA512,
+			Algorithm: AlgEncSHA256,
 		},
 		DigestValue: keyInfoDigest,
 	})
@@ -436,7 +436,7 @@ func (s *Signature) buildSignedInfo() error {
 			URI:  "#" + sp.ID,
 			Type: "http://uri.etsi.org/01903#SignedProperties",
 			DigestMethod: &AlgorithmMethod{
-				Algorithm: AlgEncSHA512,
+				Algorithm: AlgEncSHA256,
 			},
 			DigestValue: spDigest,
 		})

@@ -2,10 +2,10 @@
 
 Partial implementation of the XML DSig standard for Go. Can be used to manage certificates in .p12 format and generate signatures typically used with UBL invoice documents or similar local standards.
 
-[![Lint](https://github.com/invopop/xmldsig/actions/workflows/lint.yaml/badge.svg)](https://github.com/invopop/xmldsig/actions/workflows/lint.yaml)
-[![Test Go](https://github.com/invopop/xmldsig/actions/workflows/test.yaml/badge.svg)](https://github.com/invopop/xmldsig/actions/workflows/test.yaml)
-[![Go Report Card](https://goreportcard.com/badge/github.com/invopop/xmldsig)](https://goreportcard.com/report/github.com/invopop/xmldsig)
-[![GoDoc](https://godoc.org/github.com/invopop/xmldsig?status.svg)](https://godoc.org/github.com/invopop/xmldsig)
+[![Lint](https://github.com/StephanoAH/xmldsig/actions/workflows/lint.yaml/badge.svg)](https://github.com/StephanoAH/xmldsig/actions/workflows/lint.yaml)
+[![Test Go](https://github.com/StephanoAH/xmldsig/actions/workflows/test.yaml/badge.svg)](https://github.com/StephanoAH/xmldsig/actions/workflows/test.yaml)
+[![Go Report Card](https://goreportcard.com/badge/github.com/StephanoAH/xmldsig)](https://goreportcard.com/report/github.com/StephanoAH/xmldsig)
+[![GoDoc](https://godoc.org/github.com/StephanoAH/xmldsig?status.svg)](https://godoc.org/github.com/StephanoAH/xmldsig)
 ![Latest Tag](https://img.shields.io/github/v/tag/invopop/xmldsig)
 
 ## NOTES

@@ -1,4 +1,4 @@
-module github.com/invopop/xmldsig
+module github.com/StephanoAH/xmldsig
 
 go 1.21
 
