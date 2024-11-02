@@ -111,7 +111,7 @@ func xadesConfig() *xmldsig.XAdESConfig {
 		Description: "test",
 		Policy: &xmldsig.XAdESPolicyConfig{
 			URL:         "http://www.facturae.es/politica_de_firma_formato_facturae/politica_de_firma_formato_facturae_v3_1.pdf",
-			Description: "Política de Firma FacturaE v3.1",
+			Description: nil, //"Política de Firma FacturaE v3.1",
 			Algorithm:   "http://www.w3.org/2000/09/xmldsig#sha1",
 			Hash:        "Ohixl6upD6av8N7pEvDABhEL6hM=",
 		},

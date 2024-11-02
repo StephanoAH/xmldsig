@@ -35,10 +35,10 @@ type XAdESConfig struct {
 
 // XAdESPolicyConfig defines what policy details should be used.
 type XAdESPolicyConfig struct {
-	URL         string `json:"url"`                   // URL to the policy definition
-	Description string `json:"description,omitempty"` // Optional human description
-	Algorithm   string `json:"algorithm"`             // eg. SHA1 o SHA256
-	Hash        string `json:"hash"`                  // Base64 encoded hash (usually provided with policy)
+	URL         string  `json:"url"`                   // URL to the policy definition
+	Description *string `json:"description,omitempty"` // Optional human description
+	Algorithm   string  `json:"algorithm"`             // eg. SHA1 o SHA256
+	Hash        string  `json:"hash"`                  // Base64 encoded hash (usually provided with policy)
 }
 
 // String converts the XAdES role into a string
