@@ -67,9 +67,9 @@ type SignedInfo struct {
 
 // Reference contains ...
 type Reference struct {
-	ID   string  `xml:"Id,attr,omitempty"`
-	Type *string `xml:"Type,attr,omitempty"`
-	URI  string  `xml:"URI,attr"`
+	ID   string `xml:"Id,attr,omitempty"`
+	Type string `xml:"Type,attr,omitempty"`
+	URI  string `xml:"URI,attr"`
 
 	Transforms   *Transforms      `xml:"ds:Transforms,omitempty"`
 	DigestMethod *AlgorithmMethod `xml:"ds:DigestMethod"`
@@ -311,18 +311,18 @@ func (s *Signature) buildQualifyingProperties() {
 				},
 				PolicyIdentifier: s.xadesPolicyIdentifier(),
 			},
-			DataObjectProperties: nil, //&DataObjectFormat{
-			//	ObjectReference: "#" + s.referenceID,
-			//	Description:     s.opts.xades.Description,
-			//	ObjectIdentifier: &ObjectIdentifier{
-			//		Identifier: &Identifier{
-			//			Qualifier: "OIDAsURN",
-			//			Value:     "urn:oid:1.2.840.10003.5.109.10",
-			//		},
-			//		// Description: "",
-			//	},
-			//	MimeType: "text/xml",
-			//},
+			DataObjectProperties: &DataObjectFormat{
+				ObjectReference: "#" + s.referenceID,
+				Description:     s.opts.xades.Description,
+				ObjectIdentifier: &ObjectIdentifier{
+					Identifier: &Identifier{
+						Qualifier: "OIDAsURN",
+						Value:     "urn:oid:1.2.840.10003.5.109.10",
+					},
+					// Description: "",
+				},
+				MimeType: "text/xml",
+			},
 		},
 	}
 
@@ -346,7 +346,7 @@ func (s *Signature) xadesPolicyIdentifier() *PolicyIdentifier {
 	return &PolicyIdentifier{
 		SigPolicyID: &SigPolicyID{
 			Identifier:  policy.URL,
-			Description: nil, //&policy.Description,
+			Description: &policy.Description,
 		},
 		SigPolicyHash: &Digest{
 			Method: &AlgorithmMethod{
@@ -366,10 +366,10 @@ func (s *Signature) buildKeyInfo() {
 				certificate.NakedPEM(),
 			},
 		},
-		KeyValue: nil, //&KeyValue{
-		//	Modulus:  certificate.PrivateKeyInfo().Modulus,
-		//	Exponent: certificate.PrivateKeyInfo().Exponent,
-		//},
+		KeyValue: &KeyValue{
+			Modulus:  certificate.PrivateKeyInfo().Modulus,
+			Exponent: certificate.PrivateKeyInfo().Exponent,
+		},
 	}
 
 	for _, ca := range certificate.CaChain {
@@ -402,7 +402,7 @@ func (s *Signature) buildSignedInfo() error {
 	}
 	si.Reference = append(si.Reference, &Reference{
 		ID:   s.referenceID,
-		Type: &typeReference,
+		Type: "http://www.w3.org/2000/09/xmldsig#Object",
 		URI:  "",
 		Transforms: &Transforms{
 			Transform: []*AlgorithmMethod{
@@ -429,7 +429,6 @@ func (s *Signature) buildSignedInfo() error {
 		DigestValue: keyInfoDigest,
 	})
 
-	signedProperties := "http://uri.etsi.org/01903#SignedProperties"
 	// Finally, if present, add the XAdES digests
 	if s.opts.xades != nil {
 		sp := s.Object.QualifyingProperties.SignedProperties
@@ -440,7 +439,7 @@ func (s *Signature) buildSignedInfo() error {
 		}
 		si.Reference = append(si.Reference, &Reference{
 			URI:  "#" + sp.ID,
-			Type: &signedProperties,
+			Type: "http://uri.etsi.org/01903#SignedProperties",
 			DigestMethod: &AlgorithmMethod{
 				Algorithm: AlgEncSHA256,
 			},
