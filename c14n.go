@@ -10,6 +10,36 @@ import (
 // canonicalize will take the data and attempt to combine the namespaces provided.
 // It doesn't do much more than that, as the golang xml lib already does most of the
 // work of creating standard XML.
+func canonicalize2(data []byte, ns Namespaces) ([]byte, error) {
+	d := etree.NewDocument()
+	d.WriteSettings = etree.WriteSettings{
+		CanonicalEndTags: true,
+		CanonicalText:    true,
+		CanonicalAttrVal: true,
+	}
+	d.Indent(etree.NoIndent)
+	if err := d.ReadFromBytes(data); err != nil {
+		return nil, err
+	}
+
+	r := d.Root()
+
+	// Add any missing namespaces
+	for _, v := range ns.defs() {
+		match := false
+		for _, a := range r.Attr {
+			if a.Space == v.Space && a.Key == v.Key {
+				match = true
+			}
+		}
+		if !match {
+			r.Attr = append(r.Attr, v)
+		}
+	}
+	sort.Sort(byCanonicalAttr(r.Attr))
+
+	return d.WriteToBytes()
+}
 
 func canonicalize(data []byte, ns Namespaces) ([]byte, error) {
 	d := etree.NewDocument()
