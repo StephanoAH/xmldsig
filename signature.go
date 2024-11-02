@@ -395,13 +395,14 @@ func (s *Signature) buildSignedInfo() error {
 	}
 
 	// Add the document digest
+	typeReference := "http://www.w3.org/2000/09/xmldsig#Object"
 	docDigest, err := digestBytes(s.doc, s.opts.namespaces)
 	if err != nil {
 		return fmt.Errorf("document digest: %w", err)
 	}
 	si.Reference = append(si.Reference, &Reference{
 		ID:   s.referenceID,
-		Type: nil, //"http://www.w3.org/2000/09/xmldsig#Object",
+		Type: &typeReference,
 		URI:  "",
 		Transforms: &Transforms{
 			Transform: []*AlgorithmMethod{
