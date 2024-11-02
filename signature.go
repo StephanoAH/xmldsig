@@ -387,7 +387,7 @@ func (s *Signature) buildSignedInfo() error {
 			Algorithm: "http://www.w3.org/TR/2001/REC-xml-c14n-20010315",
 		},
 		SignatureMethod: &AlgorithmMethod{
-			Algorithm: AlgDSigRSASHA256,
+			Algorithm: AlgEncSHA256,
 			//Algorithm: AlgDSigRSASHA1,
 		},
 		Reference: []*Reference{},
