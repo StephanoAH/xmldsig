@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/beevik/etree"
-	"github.com/invopop/gobl/uuid"
 )
 
 // Namespaces
@@ -219,7 +218,7 @@ const (
 
 func newSignature(data []byte, opts ...Option) (*Signature, error) {
 	o := &options{
-		docID:      uuid.V1().String(),
+		docID:      "177533b9-98d4-11ef-bea7-00155db51154", //uuid.V1().String(),
 		namespaces: make(Namespaces),
 		timeNow:    currentTime,
 	}
@@ -426,7 +425,7 @@ func (s *Signature) buildSignedInfo() error {
 		DigestMethod: &AlgorithmMethod{
 			Algorithm: AlgEncSHA256,
 		},
-		DigestValue: "XVRkHwneKVJtNlcjuyT8BdW6NXhkA50VXQ2vd8EdRxg=", //keyInfoDigest,
+		DigestValue: "ZNDMW1FB3Y4tW1lPf3bOk07DQmDwQvOTEQkkc1KbB8M=", //keyInfoDigest,
 	})
 
 	// Finally, if present, add the XAdES digests
@@ -443,7 +442,7 @@ func (s *Signature) buildSignedInfo() error {
 			DigestMethod: &AlgorithmMethod{
 				Algorithm: AlgEncSHA256,
 			},
-			DigestValue: "XVRkHwneKVJtNlcjuyT8BdW6NXhkA50VXQ2vd8EdRxg=", //spDigest,
+			DigestValue: "TpQRglYg7vSYsBYeoy6RdlDHGqK6vKe9T7IY6gjLyws=", //spDigest,
 		})
 	}
 
