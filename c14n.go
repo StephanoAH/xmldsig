@@ -1,6 +1,8 @@
 package xmldsig
 
 import (
+	"fmt"
+	dsig "github.com/russellhaering/goxmldsig"
 	"sort"
 	"strings"
 
@@ -41,35 +43,36 @@ func canonicalize2(data []byte, ns Namespaces) ([]byte, error) {
 	return d.WriteToBytes()
 }
 
-func canonicalize(data []byte, ns Namespaces) ([]byte, error) {
-	d := etree.NewDocument()
-	d.WriteSettings = etree.WriteSettings{
-		CanonicalEndTags: true,
-		CanonicalText:    true,
-		CanonicalAttrVal: true,
-	}
-	d.Indent(etree.NoIndent)
-	if err := d.ReadFromBytes(data); err != nil {
-		return nil, err
+func canonicalize(xmlRequestInvoice []byte, ns Namespaces) ([]byte, error) {
+	doc := etree.NewDocument()
+	if err := doc.ReadFromBytes(xmlRequestInvoice); err != nil {
+		return nil, fmt.Errorf("error en CanonicalizeXML ReadFromBytes: %+v", err)
 	}
 
-	r := d.Root()
+	elementXml := doc.Root()
 
-	// Add any missing namespaces
 	for _, v := range ns.defs() {
 		match := false
-		for _, a := range r.Attr {
-			if a.Space == v.Space && a.Key == v.Key {
+		for _, attr := range elementXml.Attr {
+			if attr.Space == v.Space && attr.Key == v.Key {
 				match = true
+				break
 			}
 		}
 		if !match {
-			r.Attr = append(r.Attr, v)
+			elementXml.Attr = append(elementXml.Attr, v)
 		}
 	}
-	sort.Sort(byCanonicalAttr(r.Attr))
 
-	return d.WriteToBytes()
+	sort.Sort(byCanonicalAttr(elementXml.Attr))
+
+	canonicalizer := dsig.MakeC14N11Canonicalizer()
+	canonicalizedXml, err := canonicalizer.Canonicalize(elementXml)
+	if err != nil {
+		return nil, fmt.Errorf("error en CanonicalizeXML: %+v", err)
+	}
+
+	return canonicalizedXml, nil
 }
 
 type byCanonicalAttr []etree.Attr
