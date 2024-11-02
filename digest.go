@@ -6,7 +6,7 @@ import (
 	"encoding/xml"
 )
 
-// digest will create a base64 encoded SHA256 hash of the struct passed as
+// digest will create a base64 encoded SHA256  hash of the struct passed as
 // parameter (the struct should represent an XML)
 func digest(doc interface{}, namespaces Namespaces) (string, error) {
 	data, err := xml.Marshal(doc)

@@ -388,6 +388,7 @@ func (s *Signature) buildSignedInfo() error {
 		},
 		SignatureMethod: &AlgorithmMethod{
 			Algorithm: AlgEncSHA256,
+
 			//Algorithm: AlgDSigRSASHA1,
 		},
 		Reference: []*Reference{},
