@@ -209,12 +209,12 @@ type Identifier struct {
 }
 
 const (
-	signatureIDFormat               = "xmldsig-%s"
-	signatureRootIDFormat           = "xmldsig-%s"
-	sigPropertiesIDFormat           = "xmldsig-%s-signedprops"
-	sigQualifyingPropertiesIDFormat = "xmldsig-%s-QualifyingProperties"
+	signatureIDFormat               = "Signature-%s"
+	signatureRootIDFormat           = "Signature-%s-Signature"
+	sigPropertiesIDFormat           = "Signature-%s-SignedProperties"
+	sigQualifyingPropertiesIDFormat = "Signature-%s-QualifyingProperties"
 	referenceIDFormat               = "Reference-%s"
-	certificateIDFormat             = "xmldsig-%s-KeyInfo"
+	certificateIDFormat             = "Certificate-%s"
 )
 
 func newSignature(data []byte, opts ...Option) (*Signature, error) {
@@ -296,7 +296,7 @@ func (s *Signature) buildQualifyingProperties() {
 		SignedProperties: &SignedProperties{
 			ID: fmt.Sprintf(sigPropertiesIDFormat, s.opts.docID),
 			SignatureProperties: &SignedSignatureProperties{
-				SigningTime: s.opts.timeNow().In(time.FixedZone("America/Bogota", -5*60*60)).Format(ISO8601), // Verify if Colombia or UTC tz
+				SigningTime: s.opts.timeNow().Format(ISO8601), //s.opts.timeNow().In(time.FixedZone("America/Bogota", -5*60*60)).Format(ISO8601), // Verify if Colombia or UTC tz
 				SigningCertificate: &SigningCertificate{
 					CertDigest: &Digest{
 						Method: &AlgorithmMethod{
@@ -311,18 +311,18 @@ func (s *Signature) buildQualifyingProperties() {
 				},
 				PolicyIdentifier: s.xadesPolicyIdentifier(),
 			},
-			DataObjectProperties: nil, //&DataObjectFormat{
-			//	ObjectReference: "#" + s.referenceID,
-			//	Description:     s.opts.xades.Description,
-			//	ObjectIdentifier: &ObjectIdentifier{
-			//		Identifier: &Identifier{
-			//			Qualifier: "OIDAsURN",
-			//			Value:     "urn:oid:1.2.840.10003.5.109.10",
-			//		},
-			//		// Description: "",
-			//	},
-			//	MimeType: "text/xml",
-			//},
+			DataObjectProperties: &DataObjectFormat{
+				ObjectReference: "#" + s.referenceID,
+				Description:     s.opts.xades.Description,
+				ObjectIdentifier: &ObjectIdentifier{
+					Identifier: &Identifier{
+						Qualifier: "OIDAsURN",
+						Value:     "urn:oid:1.2.840.10003.5.109.10",
+					},
+					// Description: "",
+				},
+				MimeType: "text/xml",
+			},
 		},
 	}
 
@@ -346,7 +346,7 @@ func (s *Signature) xadesPolicyIdentifier() *PolicyIdentifier {
 	return &PolicyIdentifier{
 		SigPolicyID: &SigPolicyID{
 			Identifier:  policy.URL,
-			Description: nil, //policy.Description,
+			Description: &policy.Description,
 		},
 		SigPolicyHash: &Digest{
 			Method: &AlgorithmMethod{
@@ -366,10 +366,10 @@ func (s *Signature) buildKeyInfo() {
 				certificate.NakedPEM(),
 			},
 		},
-		KeyValue: nil, //&KeyValue{
-		//	Modulus:  certificate.PrivateKeyInfo().Modulus,
-		//	Exponent: certificate.PrivateKeyInfo().Exponent,
-		//},
+		KeyValue: &KeyValue{
+			Modulus:  certificate.PrivateKeyInfo().Modulus,
+			Exponent: certificate.PrivateKeyInfo().Exponent,
+		},
 	}
 
 	for _, ca := range certificate.CaChain {
@@ -469,7 +469,7 @@ func (s *Signature) buildSignatureValue() error {
 	}
 
 	s.Value = &Value{
-		ID:    fmt.Sprintf(signatureIDFormat+"-sigvalue", s.opts.docID),
+		ID:    fmt.Sprintf(signatureIDFormat+"-SignatureValue", s.opts.docID),
 		Value: signatureValue,
 	}
 	return nil
