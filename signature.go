@@ -395,7 +395,7 @@ func (s *Signature) buildSignedInfo() error {
 	}
 
 	// Add the document digest
-	typeReference := "http://www.w3.org/2000/09/xmldsig#Object"
+	// typeReference := "http://www.w3.org/2000/09/xmldsig#Object"
 	docDigest, err := digestBytes(s.doc, s.opts.namespaces)
 	if err != nil {
 		return fmt.Errorf("document digest: %w", err)
