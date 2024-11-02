@@ -296,7 +296,7 @@ func (s *Signature) buildQualifyingProperties() {
 		SignedProperties: &SignedProperties{
 			ID: fmt.Sprintf(sigPropertiesIDFormat, s.opts.docID),
 			SignatureProperties: &SignedSignatureProperties{
-				SigningTime: s.opts.timeNow().Format(ISO8601), //s.opts.timeNow().In(time.FixedZone("America/Bogota", -5*60*60)).Format(ISO8601), // Verify if Colombia or UTC tz
+				SigningTime: s.opts.timeNow().In(time.FixedZone("America/Bogota", -5*60*60)).Format(ISO8601), // s.opts.timeNow().Format(ISO8601), // Verify if Colombia or UTC tz
 				SigningCertificate: &SigningCertificate{
 					CertDigest: &Digest{
 						Method: &AlgorithmMethod{
