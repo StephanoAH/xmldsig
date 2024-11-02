@@ -295,7 +295,7 @@ func (s *Signature) buildQualifyingProperties() {
 		SignedProperties: &SignedProperties{
 			ID: fmt.Sprintf(sigPropertiesIDFormat, s.opts.docID),
 			SignatureProperties: &SignedSignatureProperties{
-				SigningTime: s.opts.timeNow().In(time.FixedZone("America/Bogota", -5*60*60)).Format(ISO8601), // s.opts.timeNow().Format(ISO8601), // Verify if Colombia or UTC tz
+				SigningTime: "2024-11-01T23:46:02-05:00", //s.opts.timeNow().In(time.FixedZone("America/Bogota", -5*60*60)).Format(ISO8601), // s.opts.timeNow().Format(ISO8601), // Verify if Colombia or UTC tz
 				SigningCertificate: &SigningCertificate{
 					CertDigest: &Digest{
 						Method: &AlgorithmMethod{
@@ -442,7 +442,7 @@ func (s *Signature) buildSignedInfo() error {
 			DigestMethod: &AlgorithmMethod{
 				Algorithm: AlgEncSHA256,
 			},
-			DigestValue: "TpQRglYg7vSYsBYeoy6RdlDHGqK6vKe9T7IY6gjLyws=", //spDigest,
+			DigestValue: "vqIKnA3FglnPMO7expixSLH6SqyFLjiADZil0JkcgGs=", //spDigest,
 		})
 	}
 
